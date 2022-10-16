@@ -17,7 +17,7 @@ class ContactAccessor:
         self.db = None
 
     async def connect(self, app: "Application"):
-        self.client = connect(db="contacts", host="localhost", port=27017)
+        self.client = connect(db="contacts", host="db", port=27017, username="root", password="example")
         self.db = self.client["contacts"]
         print("connect to database")
 
