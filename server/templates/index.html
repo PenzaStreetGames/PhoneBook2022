@@ -50,9 +50,13 @@
     var errorCU = document.querySelector("#err_text_cu");
     var errorRD = document.querySelector("#err_text_rd");
 
+    var localServer = "http://localhost:8080";
+    var remoteServer = "http://51.250.110.42:8080";
+    var server = remoteServer;
+
     function getContactList() {
         var settings = {
-            "url": "http://localhost:8080/v1/contact",
+            "url": server + "/v1/contact",
             "method": "GET",
             "timeout": 0,
         };
@@ -86,7 +90,7 @@
 
     function deleteAll() {
         let settings = {
-            "url": "http://localhost:8080/v1/contact",
+            "url": server + "/v1/contact",
             "method": "DELETE",
             "timeout": 0,
         };
@@ -101,7 +105,7 @@
         let id = idField.value;
 
         let settings = {
-            "url": "http://localhost:8080/v1/contact/" + id,
+            "url": server + "/v1/contact/" + id,
             "method": "GET",
             "timeout": 0,
         };
@@ -134,7 +138,7 @@
         let id = idField.value;
 
         let settings = {
-            "url": "http://localhost:8080/v1/contact/" + id,
+            "url": server + "/v1/contact/" + id,
             "method": "DELETE",
             "timeout": 0,
         };
@@ -164,7 +168,7 @@
         }
 
         let settings = {
-            "url": "http://localhost:8080/v1/contact",
+            "url": server + "/v1/contact",
             "method": "POST",
             "timeout": 0,
             "headers": {
@@ -198,7 +202,7 @@
         }
 
         let settings = {
-            "url": "http://localhost:8080/v1/contact/" + id,
+            "url": server + "/v1/contact/" + id,
             "method": "PUT",
             "timeout": 0,
             "headers": {
