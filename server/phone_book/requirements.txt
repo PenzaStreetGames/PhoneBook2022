@@ -1,0 +1,7 @@
+aiohttp==3.8.1
+aiohttp-apispec==2.2.1
+pyyaml==5.4.1
+marshmallow==3.13.0
+pymongo==4.2.0
+mongoengine==0.22.1
+aiohttp-jinja2==1.5

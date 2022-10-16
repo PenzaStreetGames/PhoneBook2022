@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Записная книжка</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container min-vh-100 align-content-center d-flex flex-column">
+    <h1>Записная книжка</h1>
+    <div class="bg-white flex-row align-items-start p-3 d-flex">
+        <div class="col-4 border rounded bg-white flex-column align-items-start p-3">
+            <h2>Работа с записью</h2>
+            <div class="border rounded bg-white flex-column align-items-start p-3">
+                <label for="id_field">ID записи: </label><input class="form-control" id="id_field" type="text"/>
+                <p id="err_text_rd"></p>
+                <button class="btn btn-outline-primary" onclick="getContactById()">Найти</button>
+                <button class="btn btn-outline-primary" onclick="deleteContact()">Удалить</button>
+            </div>
+            <div class="border rounded bg-white flex-column align-items-start p-3">
+                <label for="name_field">Имя: </label><input class="form-control" id="name_field" type="text"/>
+                <label for="email_field">Email: </label><input class="form-control" id="email_field" type="email"/>
+                <label for="phone_field">Телефон: </label><input class="form-control" id="phone_field" type="text"/>
+                <label for="home_field">Адрес: </label><input class="form-control" id="home_field" type="text"/>
+                <p id="err_text_cu"></p>
+                <button class="btn btn-outline-primary" onclick="createContact()">Создать</button>
+                <button class="btn btn-outline-primary" onclick="putContact()">Изменить</button>
+            </div>
+        </div>
+        <div class="border rounded bg-white flex-column align-items-start p-3">
+            <h2>Список записей</h2>
+            <button class="btn btn-outline-primary" onclick="deleteAll()">Очистить</button>
+            <div id="contacts_board" class="container justify-content-around d-flex flex-row m-3 align-content-start flex-wrap">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var contactList = document.querySelector("#contacts_board");
+    var idField = document.querySelector("#id_field")
+    var nameField = document.querySelector("#name_field");
+    var emailField = document.querySelector("#email_field");
+    var phoneField = document.querySelector("#phone_field");
+    var homeField = document.querySelector("#home_field");
+    var errorCU = document.querySelector("#err_text_cu");
+    var errorRD = document.querySelector("#err_text_rd");
+
+    function getContactList() {
+        var settings = {
+            "url": "http://localhost:8080/v1/contact",
+            "method": "GET",
+            "timeout": 0,
+        };
+        let table;
+
+        $.ajax(settings).done(function (response) {
+            // console.log(response);
+            table = response;
+            updateTable(table);
+        });
+    }
+
+    function updateTable(table) {
+        contactList.innerHTML = "";
+        for (let row of table["contacts"]) {
+            let div = document.createElement("div");
+            div.setAttribute("class", "border rounded bg-white flex-column align-items-start p-3")
+            // console.log(row);
+            for (let attr in row) {
+                let val = row[attr];
+                let p = document.createElement("p")
+                let i = document.createElement("b")
+                i.innerHTML = attr
+                p.appendChild(i)
+                p.innerHTML += " " + val;
+                div.appendChild(p)
+            }
+            contactList.appendChild(div);
+        }
+    }
+
+    function deleteAll() {
+        let settings = {
+            "url": "http://localhost:8080/v1/contact",
+            "method": "DELETE",
+            "timeout": 0,
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            getContactList();
+        });
+    }
+
+    function getContactById() {
+        let id = idField.value;
+
+        let settings = {
+            "url": "http://localhost:8080/v1/contact/" + id,
+            "method": "GET",
+            "timeout": 0,
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            if ("id" in response) {
+                nameField.value = response["username"];
+                emailField.value = response["email"];
+                phoneField.value = response["mobile"];
+                homeField.value = response["home"];
+                errorRD.textContent = "";
+            } else {
+                nameField.value = "";
+                emailField.value = "";
+                phoneField.value = "";
+                homeField.value = "";
+                errorRD.textContent = "ID не найден";
+            }
+        }).fail(function(xhr, status, error) {
+            nameField.value = "";
+            emailField.value = "";
+            phoneField.value = "";
+            homeField.value = "";
+            errorRD.textContent = "ID не найден";
+        });
+    }
+
+    function deleteContact() {
+        let id = idField.value;
+
+        let settings = {
+            "url": "http://localhost:8080/v1/contact/" + id,
+            "method": "DELETE",
+            "timeout": 0,
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            if ("id" in response) {
+                errorRD.textContent = "";
+                getContactList()
+            } else {
+                errorRD.textContent = "ID не найден";
+            }
+        }).fail(function(xhr, status, error) {
+            errorRD.textContent = "ID не найден";
+        });
+    }
+
+    function createContact() {
+        let username = nameField.value;
+        let mail = emailField.value;
+        let phone = phoneField.value;
+        let home = homeField.value;
+
+        if (username.length === 0 || mail.length === 0 || phone.length === 0 || home.length === 0) {
+            errorCU.textContent = "Заполните все поля: имя, почта, телефон, адрес"
+            return
+        }
+
+        let settings = {
+            "url": "http://localhost:8080/v1/contact",
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "data": JSON.stringify({
+                "username": username,
+                "email": mail,
+                "mobile": phone,
+                "home": home
+            }),
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            errorCU.textContent = ""
+            getContactList();
+        });
+    }
+
+    function putContact() {
+        let id = idField.value;
+        let username = nameField.value;
+        let mail = emailField.value;
+        let phone = phoneField.value;
+        let home = homeField.value;
+
+        if (username.length === 0 || mail.length === 0 || phone.length === 0 || home.length === 0 || id.length === 0) {
+            errorCU.textContent = "Заполните все поля: имя, почта, телефон, адрес, id"
+            return
+        }
+
+        let settings = {
+            "url": "http://localhost:8080/v1/contact/" + id,
+            "method": "PUT",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "data": JSON.stringify({
+                "id": id,
+                "username": username,
+                "email": mail,
+                "mobile": phone,
+                "home": home
+            }),
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            if ("id" in response) {
+                errorCU.textContent = "";
+                getContactList()
+            } else {
+                errorCU.textContent = "ID не найден";
+            }
+        }).fail(function(xhr, status, error) {
+            errorCU.textContent = "ID не найден";
+        });
+    }
+
+    getContactList()
+    setInterval(getContactList, 5000)
+</script>
+</body>
+</html>
