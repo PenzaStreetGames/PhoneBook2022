@@ -1,6 +1,6 @@
 import typing
 
-from phone_book.app.contact.html.views import ContactListWebView, ContactWebView
+from phone_book.app.contact.html.views import ContactListWebView
 
 if typing.TYPE_CHECKING:
     from aiohttp.web_app import Application
