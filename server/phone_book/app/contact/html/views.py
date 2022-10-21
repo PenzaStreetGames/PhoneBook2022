@@ -7,6 +7,3 @@ class ContactListWebView(View):
     async def get(self):
         return {}
 
-
-class ContactWebView(View):
-    pass

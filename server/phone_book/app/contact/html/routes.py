@@ -8,4 +8,3 @@ if typing.TYPE_CHECKING:
 
 def setup_routes(app: "Application"):
     app.router.add_view("/web/contact", ContactListWebView)
-    app.router.add_view("/web/contact/{uid}", ContactWebView)
